@@ -6,11 +6,16 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "axios": "^0.19.2",
+    "bent": "^7.0.5",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "ejs": "~2.6.1",
-    "express": "~4.16.1",
+    "express": "^4.16.4",
+    "express-async-handler": "^1.1.4",
+    "express-partials": "^0.3.0",
     "http-errors": "~1.6.3",
-    "morgan": "~1.9.1"
+    "morgan": "~1.9.1",
+    "request": "^2.88.0"
   }
 }
