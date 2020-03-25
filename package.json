@@ -16,6 +16,22 @@
     "express-partials": "^0.3.0",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
-    "request": "^2.88.0"
+    "body-parse": "^0.1.0",
+    "exceljs": "^1.12.0",
+    "jquery": "^3.4.1",
+    "jsdom": "^15.2.1",
+    "jsonfile": "^5.0.0",
+    "partials": "^0.1.0",
+    "pivottable": "^2.23.0",
+    "request-promise": "^4.2.4",
+    "sleep": "^6.1.0",
+    "tempfile": "^3.0.0",
+    "xlsx": "^0.15.1",
+    "body-parser": "1.0.1",
+    "js-beautify": "",
+    "html-to-text": "",
+    "php-unserialize": "",
+    "elementtree": "",
+    "async": ""
   }
 }

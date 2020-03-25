@@ -9,6 +9,9 @@ var dashboardController = require('../controllers/dashboardController');
 router.get('/', function(req, res, next) {
   res.render('index');
 });
+router.get('/index', function(req, res, next) {
+  res.render('index');
+});
 router.get('/favicon.ico', function (req,res,next) {
   res.send('')
 });

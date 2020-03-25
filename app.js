@@ -22,6 +22,7 @@ app.use(cookieParser());
 app.use('/javascripts',express.static(path.join(__dirname, 'public/javascripts')));
 app.use('/stylesheets',express.static(path.join(__dirname, 'public/stylesheets')));
 app.use('/images',express.static(path.join(__dirname, 'public/images')));
+app.use('/pivot', express.static(path.join(__dirname, 'public/javascripts/pivottable/dist')));
 app.all('*', indexRouter);
 
 // catch 404 and forward to error handler
