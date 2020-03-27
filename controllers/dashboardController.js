@@ -1,48 +1,17 @@
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const xlsx = require('xlsx');
-const tempfile = require('tempfile');
 const Excel = require('exceljs/modern.nodejs');
-const jsonfile = require('jsonfile')
+const jsonfile = require('jsonfile');
 
-var dockerDestino = 'localhost';
-
-exports.axiosConnection= (req, res, next) =>{
-    console.log('req.url:'+ req.url);  //Test
-    var requestedUrl = '';
-    var directorioDestino = req.url;
-    //De req.path obtiene el directorio inicial (graphfes/mwdex/test/etc) y lo almacena en la variable requestedUrl.
-    if(req.url=='/graphfes' || req.url=='/mwdex'){
-        requestedUrl = ''+req.url;
-    }else{requestedUrl='no change'}
-    console.log('requestedUrl: '+requestedUrl); //Test
-    switch (requestedUrl) {
-        case(''):
-            dockerDestino='localhost';
-            directorioDestino ='/';
-            break;
-        case ('/graphfes'):
-            dockerDestino='graphfes';
-            directorioDestino ='/';
-            break;
-        case ('/mwdex'):
-            dockerDestino='mwdex';
-            directorioDestino ='/';
-            break;
-            //En el caso en el que no se haga ninguna llamada de inicio a uno de los servidores, dockerDestino se mantendrá en su valor.
-        default: break;
-    }
-    console.log('dockerDestino: '+dockerDestino);  //Test
-    console.log('Mandando petición a: '+dockerDestino +':3000'+directorioDestino + ' con método ' + req.method);
-
+exports.axiosConnection= (req, res) =>{
     //Petición GET via Axios al contenedor de Docker con nombre destination
     if(req.method==='GET') {
         //Coger el "Excel" para pedir un JSON y después construirlo en local
         var check = "json";
         if (getFormCheck(req.url)==='check=excel'){check = "excel"}else{check = "json"}
 
-        axios.get('http://' + dockerDestino + ':3000' + directorioDestino)
+        axios.get('http://' + req.session.dockerDestino + ':3000' + req.url)
             .then(function (response) {
                 console.log("HTTP Response header: "+response.headers['content-type']);
                 //Se renderiza el fichero local respuesta con la respuesta HMTL del servidor bajo el parámetro body
@@ -121,34 +90,11 @@ exports.axiosConnection= (req, res, next) =>{
                         }
                     }
                 }
-                /*else if(response.headers['content-type'] === "application/vnd.openxmlformats"){
-                    var workbook = new Excel.Workbook();
-                    fs.writeFileSync(path.join(__dirname, '/mwdex/tempexcel'), response.data);
-                    console.log("Fichero escrito y alojado");
-                    /*Comprobación de que el fichero ha sido escrito correctamente
-                    res.sendFile(path.join(__dirname, '/mwdex/tempexcel'));
-
-
-                    var fname = tempfile('.xlsx');
-                    console.log("fichero temporal creado: "+fname);
-                    fs.writeFileSync(fname,response.data);
-                    fs.readFile(path.join(__dirname, '/graphs/tempgraph.gexf'), function read(err, data) {
-                        if (err) {
-                            throw err;
-                        }
-                        const content = data;
-                        console.log(content);
-                    });
-                    res.setHeader('Content-Type', 'application/vnd.openxmlformats');
-                    res.setHeader("Content-Disposition", "attachment; filename=grades.xlsx");
-                    res.sendFile(fname);
-                    fs.unlinkSync(fname);
-                }*/
                 else{
                     /*Como no es HTML, para evitar fallos no se renderiza el fichero recibido, sino que se guarda el fichero.
                         Luego otra ruta se encargará de llamarlo/renderizarlo.
                     */
-                    if(dockerDestino==="graphfes") {
+                    if(req.session.dockerDestino==="graphfes") {
                         fs.writeFileSync(path.join(__dirname, '/graphs/tempgraph.gexf'), response.data);
                         console.log("Fichero escrito y alojado");
                         /*Comprobación de que el fichero ha sido escrito correctamente */
@@ -161,8 +107,8 @@ exports.axiosConnection= (req, res, next) =>{
                         });
                         res.sendFile(path.join(__dirname, '/graphs/tempgraph.gexf'));
                     }
-                    else if(dockerDestino==="mwdex"){
-                        /*let ts = Date.now();
+                    else if(req.session.dockerDestino==="mwdex"){
+                        let ts = Date.now();
                         let date_ob = new Date(ts);
                         let date = ("0" + date_ob.getDate()).slice(-2);
                         let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
@@ -170,18 +116,15 @@ exports.axiosConnection= (req, res, next) =>{
                         let hours = ("0" + date_ob.getHours()).slice(-2);
                         let minutes = ("0" + date_ob.getMinutes()).slice(-2);
                         let seconds = ("0" + date_ob.getSeconds()).slice(-2);
-
                         let filename = 'MWDEX_download_' + year + "_" + month + "_" + date + "_" + hours + "_" + minutes + "_" + seconds + '.xlsx';
-                        console.log(response.data);
 
-                        var workbook = xlsx.read(response.data, {type: "buffer"});
-                        res.setHeader('Content-Type', 'application/vnd.openxmlformats');
-                        res.setHeader("Content-Disposition", "attachment; filename=" + filename);
-                        workbook.xlsx.write(res).then(function(){
-                            res.end();
-                        });*/
+                        fs.writeFile(path.join(__dirname, '/mwdex/tempfile.xlsx'), response.data,function (err){
+                           console.log(err);
+                        });
 
-
+                            res.setHeader('Content-Type', 'application/vnd.openxmlformats');
+                            res.setHeader("Content-Disposition", "attachment; filename=" + filename);
+                            res.sendFile(path.join(__dirname, '/mwdex/tempfile.xlsx'))
                     }
                 }
             })
@@ -191,7 +134,7 @@ exports.axiosConnection= (req, res, next) =>{
             });
     }
     else if (req.method==='POST'){
-        axios.post('http://' + dockerDestino + ':3000' + directorioDestino, req.body)
+        axios.post('http://' + req.session.dockerDestino + ':3000' + req.url, req.body)
         .then(function (response) {
         //Se renderiza el fichero local respuesta con la respuesta HMTL del servidor bajo el parámetro body
         res.render('result', {body: response.data});

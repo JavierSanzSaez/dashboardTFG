@@ -1,18 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
-const asyncHandler = require('express-async-handler');
 var dashboardController = require('../controllers/dashboardController');
 
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res) {
   res.render('index');
 });
-router.get('/index', function(req, res, next) {
+router.get('/index', function(req, res) {
   res.render('index');
 });
-router.get('/favicon.ico', function (req,res,next) {
+router.get('/favicon.ico', function (req,res) {
   res.send('')
 });
 

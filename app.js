@@ -5,8 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var partials = require('express-partials');
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var dashboardController = require('./controllers/dashboardController');
+var session = require('cookie-session');
+var sessionController = require('./controllers/session');
 
 var app = express();
 
@@ -19,11 +19,22 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+app.use(function (req,res,next) {
+  res.locals.session = req.session;
+});
+
+app.use(session({
+  name: 'session',
+  keys:["dashboardTFGpublic","dashboardTFGprivate"],
+  maxAge: 2*60*60*1000
+}));
+
 app.use('/javascripts',express.static(path.join(__dirname, 'public/javascripts')));
 app.use('/stylesheets',express.static(path.join(__dirname, 'public/stylesheets')));
 app.use('/images',express.static(path.join(__dirname, 'public/images')));
 app.use('/pivot', express.static(path.join(__dirname, 'public/javascripts/pivottable/dist')));
-app.all('*', indexRouter);
+app.all('*',sessionController.checkSession, indexRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
