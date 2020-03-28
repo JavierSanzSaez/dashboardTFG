@@ -1,13 +1,16 @@
 const maxIdleTime = 5*60*1000;
 
 exports.checkSession = (req,res,next)=>{
-    let requestedUrl = '';
+
     deleteExpiredUserSession(req,res);
+
     if(!req.session.dockerDestino){
-        res.render('index',{session:false});
+        req.session = null;
+        res.render('index', {sesion : false});
         res.end()
     }
 
+    let requestedUrl = '';
     if(req.url==='/graphfes' || req.url==='/mwdex'){
         requestedUrl = req.url;
     }else{requestedUrl='no change'}
@@ -24,16 +27,17 @@ exports.checkSession = (req,res,next)=>{
         default:
             break;
     }
+
     next();
 };
 
 function deleteExpiredUserSession (req,res){
-  if(req.sessionOptions.maxAge < Date.now()){
+  if(req.session.maxAge < Date.now()){
     req.session = null;
-    res.render('index');
+    res.render('index',{sesion : false});
     res.end();
   }
   else{
-      req.sessionOptions.maxAge = Date.now()+maxIdleTime;
+      req.session.maxAge = Date.now()+maxIdleTime;
   }
 }
