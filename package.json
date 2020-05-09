@@ -24,7 +24,7 @@
     "express-session": "^1.17.0",
     "html-to-text": "",
     "http-errors": "~1.6.3",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "js-beautify": "",
     "jsdom": "^15.2.1",
     "jsonfile": "^5.0.0",
