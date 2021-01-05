@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "async": "",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "bent": "^7.0.5",
     "body-parse": "^0.1.0",
     "body-parser": "1.0.1",
